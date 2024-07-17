@@ -1,4 +1,5 @@
 group 'com.fy.flutter_device_id'
+
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -26,6 +27,10 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 31
+
+    if (project.android.hasProperty("namespace")) {
+        namespace = group
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -62,3 +67,16 @@ android {
         }
     }
 }
+
+task setupManifest {
+    doLast {
+        def manifestFile = file("$projectDir/src/main/AndroidManifest.xml")
+        if (project.android.hasProperty("namespace")) {
+            manifestFile.text = "<manifest />"
+        } else {
+            manifestFile.text = "<manifest package=\"${project["group"]}\" />"
+        }
+    }
+}
+
+preBuild.dependsOn(setupManifest)
